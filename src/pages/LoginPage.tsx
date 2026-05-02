@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { Activity, Mail, Lock, User, UserCheck } from 'lucide-react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { Activity, Mail, Lock, User, UserCheck, Chrome } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -23,14 +23,33 @@ export default function LoginPage() {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
-        // Profile will be loaded by AuthContext, redirecting handled in useEffect or ProtectedRoute
       } else {
         await createUserWithEmailAndPassword(auth, email, password);
-        // Role is handled during onboarding after account creation
         navigate('/onboarding', { state: { initialRole: role } });
       }
     } catch (err: any) {
-      setError(err.message || 'Authentication failed');
+      if (err.code === 'auth/operation-not-allowed') {
+        setError('Email/Password login is not enabled in Firebase Console. Please enable it in the Authentication tab.');
+      } else {
+        setError(err.message || 'Authentication failed');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      if (err.code === 'auth/operation-not-allowed') {
+        setError('Google sign-in is not enabled in Firebase Console. Please enable it in the Authentication tab under "Providers".');
+      } else {
+        setError(err.message || 'Google Authentication failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -145,6 +164,25 @@ export default function LoginPage() {
               ) : (
                 isLogin ? 'Sign In' : 'Create Vault'
               )}
+            </button>
+
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-100"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase font-black tracking-[0.2em]">
+                <span className="bg-white px-4 text-slate-400">Secure Gateway</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full py-4 px-6 bg-white border-2 border-slate-100 rounded-2xl font-black text-slate-700 flex items-center justify-center gap-3 hover:border-blue-600 hover:text-blue-600 transition-all group overflow-hidden relative shadow-sm"
+            >
+              <Chrome className="h-5 w-5 group-hover:scale-110 transition-transform" />
+              Continue with Google
             </button>
           </form>
         </div>
