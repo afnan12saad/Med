@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, orderBy, getDocs } from 'firebase/firestore';
-import { ChevronLeft, UserCircle, FileText, ExternalLink, Calendar, Lock, AlertCircle } from 'lucide-react';
+import { ChevronLeft, UserCircle, FileText, ExternalLink, Calendar, Lock, AlertCircle, ShieldCheck, Activity } from 'lucide-react';
 import { db } from '../lib/firebase';
 
 interface PatientProfile {
@@ -123,58 +123,75 @@ export default function PatientViewPage() {
       </button>
 
       {/* Patient Profile Header */}
-      <div className="geo-card p-10 flex flex-col md:flex-row items-center gap-10">
-        <div className="w-24 h-24 bg-blue-50 rounded-[32px] flex items-center justify-center text-blue-600 border border-blue-100 shrink-0">
-          <UserCircle className="h-12 w-12" />
+      <div className="geo-card p-10 flex flex-col md:flex-row items-center gap-10 bg-slate-900 border-none">
+        <div className="w-32 h-32 bg-blue-600 rounded-[40px] flex items-center justify-center text-white border-4 border-slate-800 shadow-2xl shrink-0">
+          <UserCircle className="h-16 w-16" />
         </div>
         <div className="text-center md:text-left flex-1">
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter">{patient?.name}</h1>
-          <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-4">
-            <div className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-black text-slate-500 uppercase tracking-widest border border-slate-100">
+          <h1 className="text-5xl font-black text-white tracking-tighter">{patient?.name}</h1>
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
+            <div className="px-6 py-2 bg-slate-800 rounded-2xl text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] border border-slate-700">
               {patient?.age} Years
             </div>
-            <div className="px-4 py-2 bg-slate-50 rounded-xl text-xs font-black text-slate-500 uppercase tracking-widest border border-slate-100">
+            <div className="px-6 py-2 bg-slate-800 rounded-2xl text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border border-slate-700">
               {patient?.gender}
             </div>
-            <div className="px-4 py-2 bg-red-50 rounded-xl text-xs font-black text-red-600 uppercase tracking-widest border border-red-100">
+            <div className="px-6 py-2 bg-red-950 rounded-2xl text-[10px] font-black text-red-500 uppercase tracking-[0.2em] border border-red-900/50">
               Blood: {patient?.bloodGroup}
             </div>
           </div>
         </div>
+        <div className="hidden lg:block w-px h-24 bg-slate-800 mx-4"></div>
+        <div className="flex flex-col items-center gap-2 bg-slate-800 p-6 rounded-[32px] border border-slate-700">
+           <ShieldCheck className="h-8 w-8 text-green-400" />
+           <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Authorized Access</p>
+        </div>
       </div>
 
       {/* Records Timeline */}
-      <div className="space-y-8">
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-          <FileText className="h-7 w-7 text-blue-600" /> Medical Repository
-        </h2>
+      <div className="space-y-12">
+        <div className="flex items-center gap-4">
+          <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+            <FileText className="h-8 w-8 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black text-slate-900 tracking-tight">Clinical Repository</h2>
+            <p className="text-slate-500 font-medium">All synchronized medical data for this patient.</p>
+          </div>
+        </div>
         
         {records.length === 0 ? (
-          <div className="geo-card p-20 text-center border-dashed">
-             <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No synchronized records found.</p>
+          <div className="geo-card p-32 text-center border-dashed border-2 bg-slate-50/50">
+             <p className="text-slate-400 font-black uppercase tracking-[0.3em] text-sm">Vault is Empty</p>
+             <p className="text-slate-500 mt-2 font-medium">No medical documents have been shared yet.</p>
           </div>
         ) : (
-          <div className="space-y-6 relative ml-4 sm:ml-6">
-             <div className="absolute left-0 top-0 bottom-0 w-1 bg-slate-100 rounded-full"></div>
+          <div className="space-y-8 relative ml-4 sm:ml-8">
+             <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-slate-100 rounded-full"></div>
              {records.map((record) => (
-                <div key={record.id} className="relative pl-10">
-                   <div className="absolute left-[-6px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-blue-600 border-4 border-white shadow-md"></div>
-                   <div className="geo-card p-6 flex flex-col sm:flex-row items-center justify-between gap-6 hover:border-blue-300 transition-all">
-                      <div className="flex items-center gap-6">
-                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xs shadow-sm ${
+                <div key={record.id} className="relative pl-12 group">
+                   <div className="absolute left-[-11px] top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-blue-600 border-4 border-slate-50 shadow-xl shadow-blue-100 group-hover:scale-125 transition-transform"></div>
+                   <div className="geo-card p-8 flex flex-col lg:flex-row items-center justify-between gap-8 hover:border-blue-400 transition-all group-hover:-translate-y-1 duration-300">
+                      <div className="flex items-center gap-8">
+                         <div className={`w-20 h-20 rounded-[32px] flex items-center justify-center font-black text-sm shadow-sm ${
                             record.type === 'prescription' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'
                          }`}>
-                            {record.type === 'prescription' ? 'RX' : 'PDF'}
+                            {record.type === 'prescription' ? 'RX' : 'LAB'}
                          </div>
                          <div>
-                            <h3 className="font-black text-slate-900 capitalize text-lg tracking-tight">{record.type}</h3>
-                            <div className="flex items-center gap-3 text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">
-                               <div className="flex items-center gap-1">
-                                 <Calendar className="h-3 w-3" />
-                                 {new Date(record.createdAt).toLocaleDateString()}
+                            <div className="flex items-center gap-3 mb-1">
+                               <h3 className="font-black text-slate-900 capitalize text-2xl tracking-tighter">{record.type}</h3>
+                               <span className="px-3 py-1 bg-slate-100 rounded-lg text-[8px] font-black text-slate-500 uppercase tracking-widest">Verified</span>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-6 text-xs font-black text-slate-400 uppercase tracking-widest">
+                               <div className="flex items-center gap-2">
+                                 <Calendar className="h-4 w-4" />
+                                 {new Date(record.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
                                </div>
-                               <span>•</span>
-                               <span className="truncate max-w-[150px]">{record.fileName}</span>
+                               <div className="flex items-center gap-2">
+                                 <Activity className="h-4 w-4" />
+                                 {record.fileName}
+                               </div>
                             </div>
                          </div>
                       </div>
@@ -182,15 +199,15 @@ export default function PatientViewPage() {
                         href={record.fileURL} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="btn-secondary py-3 px-6 text-sm flex items-center gap-2"
+                        className="btn-primary py-4 px-10 text-base"
                       >
-                         <ExternalLink className="h-4 w-4" /> View Record
+                         Open Document <ExternalLink className="h-5 w-5" />
                       </a>
                    </div>
                 </div>
              ))}
           </div>
-        )}
+        ) }
       </div>
     </div>
   );

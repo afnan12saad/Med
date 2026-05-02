@@ -1,6 +1,6 @@
 {
   "name": "MedVault",
   "description": "A portable digital health record system for patients and doctors to securely share medical records.",
-  "requestFramePermissions": [],
-  "majorCapabilities": []
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["firebase", "gemini_api"]
 }

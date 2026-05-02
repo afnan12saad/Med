@@ -32,6 +32,21 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["patientId", "fileURL", "type", "createdAt"]
+    },
+    "Reminder": {
+      "title": "Reminder",
+      "description": "Medical reminders for patients (pills, appointments)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "title": { "type": "string" },
+        "time": { "type": "string" },
+        "days": { "type": "array" },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["patientId", "title", "time", "active"]
     }
   },
   "firestore": {
@@ -42,6 +57,10 @@
     "records/{recordId}": {
       "schema": "MedicalRecord",
       "description": "Medical records repository"
+    },
+    "reminders/{reminderId}": {
+      "schema": "Reminder",
+      "description": "Patient medication and appointment reminders"
     }
   }
 }
