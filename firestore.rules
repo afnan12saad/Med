@@ -1,0 +1,40 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getPatient(patientId) {
+      return get(/databases/$(database)/documents/users/$(patientId)).data;
+    }
+
+    // User collection rules
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId);
+    }
+
+    // Records collection rules
+    match /records/{recordId} {
+      allow read: if isOwner(resource.data.patientId) || (
+        isSignedIn() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'doctor' &&
+        getPatient(resource.data.patientId).sharingEnabled == true
+      );
+      allow create: if isOwner(request.resource.data.patientId);
+      allow delete: if isOwner(resource.data.patientId);
+    }
+  }
+}
