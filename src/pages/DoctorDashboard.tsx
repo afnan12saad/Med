@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, UserCircle, QrCode, Activity, ScanLine, ShieldCheck } from 'lucide-react';
+import { Search, UserCircle, QrCode, Activity, ScanLine, ShieldCheck, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { QRScanner } from '../components/QRScanner';
+
+import { HealthuChatbot } from '../components/HealthuChatbot';
 
 export default function DoctorDashboard() {
   const { profile } = useAuth();
@@ -29,7 +31,7 @@ export default function DoctorDashboard() {
       {showScanner && <QRScanner onScan={handleScan} onClose={() => setShowScanner(false)} />}
       
       {/* Welcome Section */}
-      <div className="geo-card-blue relative overflow-hidden flex flex-col lg:flex-row items-center gap-10 p-12 bg-slate-900">
+      <div className="geo-card-blue relative overflow-hidden flex flex-col lg:flex-row items-center gap-10 p-12 bg-slate-900 border-none">
         <div className="relative z-10 w-24 h-24 bg-blue-600 rounded-[32px] shadow-xl shadow-blue-900/40 flex items-center justify-center shrink-0">
           <UserCircle className="h-12 w-12 text-white" />
         </div>
@@ -51,11 +53,23 @@ export default function DoctorDashboard() {
         >
           <ScanLine className="h-6 w-6 group-hover:rotate-90 transition-transform duration-500" />
           Scan Health QR
-          <div className="absolute inset-0 bg-white/10 translate-y-full hover:translate-y-0 transition-transform"></div>
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        {/* News/Tip Card */}
+        <div className="md:col-span-12 lg:col-span-12">
+          <div className="bg-yellow-50 border border-yellow-100 p-8 rounded-[40px] flex flex-col md:flex-row items-center gap-8">
+            <div className="w-16 h-16 bg-yellow-400/20 rounded-[24px] flex items-center justify-center shrink-0">
+              <Heart className="h-8 w-8 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-yellow-800 font-black text-xs uppercase tracking-[0.2em] mb-2">Clinical Protocol</p>
+              <p className="text-yellow-900/70 font-bold text-lg leading-tight">Always authenticate patient identification via the Digital Health Pass before performing any diagnostic procedures or updates to the medical vault.</p>
+            </div>
+          </div>
+        </div>
+
         {/* Search Card */}
         <div className="md:col-span-12 lg:col-span-8">
           <div className="geo-card p-10 space-y-10">
@@ -100,17 +114,17 @@ export default function DoctorDashboard() {
             <Activity className="absolute -right-4 -bottom-4 h-32 w-32 text-white/10 group-hover:scale-110 transition-transform" />
             <h3 className="font-black text-2xl mb-2 relative z-10">Real-time Sync</h3>
             <p className="text-blue-100 text-sm font-bold relative z-10 leading-relaxed">
-              Records are retrieved directly from the patient vault. No data is stored locally on this terminal.
+              Records are retrieved directly from the patient vault. No data is stored locally.
             </p>
           </div>
 
           {[
-            { title: 'Secure Protocol', desc: 'Industry standard AES encryption for all data transit.', color: 'slate' },
-            { title: 'Digital Signature', desc: 'Verified doctor credentials required for all read actions.', color: 'slate' }
+            { title: 'Secure Protocol', desc: 'Industry standard AES encryption for all data transit.', icon: ShieldCheck },
+            { title: 'Digital Signature', desc: 'Verified doctor credentials required for all read actions.', icon: UserCircle }
           ].map((item, i) => (
-            <div key={i} className="geo-card p-8">
-              <div className="w-10 h-10 bg-slate-50 rounded-xl mb-4 flex items-center justify-center text-slate-400">
-                 <ShieldCheck className="h-5 w-5" />
+            <div key={i} className="geo-card p-8 group">
+              <div className="w-12 h-12 bg-slate-50 rounded-2xl mb-4 flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                 <item.icon className="h-6 w-6" />
               </div>
               <h3 className="font-black text-slate-900 mb-1">{item.title}</h3>
               <p className="text-sm text-slate-500 font-medium">{item.desc}</p>
@@ -118,6 +132,8 @@ export default function DoctorDashboard() {
           ))}
         </div>
       </div>
+
+      <HealthuChatbot />
     </div>
   );
 }

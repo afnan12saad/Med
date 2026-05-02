@@ -32,3 +32,12 @@
     @apply w-full px-4 py-4 bg-slate-100/50 border-2 border-transparent rounded-2xl outline-none focus:bg-white focus:border-blue-600 transition-all font-medium;
   }
 }
+
+@keyframes scan {
+  from { top: 0%; }
+  to { top: 100%; }
+}
+
+.animate-scan {
+  animation: scan 2s linear infinite;
+}

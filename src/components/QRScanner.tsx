@@ -50,7 +50,13 @@ export const QRScanner: React.FC<QRScannerProps> = ({ onScan, onClose }) => {
           <h2 className="text-2xl font-black text-slate-900 mb-2">Scan Health QR</h2>
           <p className="text-slate-500 font-medium mb-8">Point the camera at the patient's MedVault QR code.</p>
           
-          <div id="qr-reader" className="overflow-hidden rounded-3xl border-4 border-slate-50 shadow-inner bg-slate-50"></div>
+          <div className="relative group">
+            <div id="qr-reader" className="overflow-hidden rounded-3xl border-4 border-slate-900 shadow-2xl bg-black"></div>
+            {/* Scanning Line Overlay */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+              <div className="w-full h-1 bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)] absolute top-0 animate-[scan_2s_linear_infinite]"></div>
+            </div>
+          </div>
           
           <div className="mt-8 text-center">
             <p className="text-xs font-black text-slate-400 uppercase tracking-widest">

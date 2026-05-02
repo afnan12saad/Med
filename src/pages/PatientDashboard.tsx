@@ -81,8 +81,10 @@ export default function PatientDashboard() {
             </div>
             <div className="geo-card p-8 bg-slate-900 border-none group overflow-hidden relative">
               <Heart className="absolute -right-4 -bottom-4 h-32 w-32 text-white/5 group-hover:scale-110 transition-transform" />
-              <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 relative z-10">Status</p>
-              <p className="text-2xl font-black text-green-400 tracking-tighter relative z-10 uppercase">Healthy</p>
+              <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1 relative z-10">Vault Status</p>
+              <p className="text-2xl font-black text-green-400 tracking-tighter relative z-10 uppercase flex items-center gap-2">
+                <ShieldCheck className="h-6 w-6" /> Secured
+              </p>
             </div>
             <div className="geo-card p-8 group overflow-hidden relative">
               <MapPin className="absolute -right-4 -bottom-4 h-24 w-24 text-slate-100 group-hover:scale-110 transition-transform" />

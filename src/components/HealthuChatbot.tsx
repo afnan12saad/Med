@@ -28,7 +28,7 @@ export const HealthuChatbot = () => {
     setLoading(true);
 
     const history = messages.map(m => ({
-      role: m.role === 'model' ? 'assistant' : 'user',
+      role: m.role,
       parts: [{ text: m.content }]
     }));
 

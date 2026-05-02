@@ -22,14 +22,50 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (err: any) {
+          // If user doesn't exist, automatically try to create the account (The "Bypass")
+          if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-credential') {
+            try {
+              await createUserWithEmailAndPassword(auth, email, password);
+              navigate('/onboarding', { state: { initialRole: role } });
+            } catch (createErr: any) {
+              throw createErr;
+            }
+          } else {
+            throw err;
+          }
+        }
       } else {
-        await createUserWithEmailAndPassword(auth, email, password);
-        navigate('/onboarding', { state: { initialRole: role } });
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          navigate('/onboarding', { state: { initialRole: role } });
+        } catch (err: any) {
+          // If email already in use, automatically try to sign in (The "Bypass")
+          if (err.code === 'auth/email-already-in-use') {
+            try {
+              await signInWithEmailAndPassword(auth, email, password);
+            } catch (loginErr: any) {
+              if (loginErr.code === 'auth/wrong-password' || loginErr.code === 'auth/invalid-credential') {
+                setError('This account already exists, but the password provided is incorrect.');
+                setLoading(false);
+                return;
+              }
+              throw loginErr;
+            }
+          } else {
+            throw err;
+          }
+        }
       }
     } catch (err: any) {
       if (err.code === 'auth/operation-not-allowed') {
-        setError('Email/Password login is not enabled in Firebase Console. Please enable it in the Authentication tab.');
+        setError('Auth provider not enabled. Go to Firebase Console > Authentication > Sign-in method and enable Email/Password.');
+      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        setError('Invalid credentials. Please check your email and password.');
+      } else if (err.code === 'auth/weak-password') {
+        setError('Password should be at least 6 characters.');
       } else {
         setError(err.message || 'Authentication failed');
       }
@@ -149,8 +185,13 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="p-4 bg-red-50 text-red-600 text-xs font-bold rounded-2xl border border-red-100">
-                {error}
+              <div className="p-5 bg-red-50 text-red-700 text-xs font-bold rounded-[24px] border border-red-100 space-y-2">
+                <p>{error}</p>
+                {error.includes('operation-not-allowed') && (
+                  <div className="pt-2 border-t border-red-100 text-[10px] text-red-500 uppercase tracking-wider leading-relaxed">
+                    ⚙️ Fix: Go to Firebase Console → Authentication → Sign-in method and enable "Email/Password" and "Google".
+                  </div>
+                )}
               </div>
             )}
 
